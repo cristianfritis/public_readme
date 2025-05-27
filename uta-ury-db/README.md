@@ -1,5 +1,7 @@
 # Modelo Entidad-Relación
 
+## Diagrama Entidad-Relación
+
 ```mermaid
 erDiagram
     %% ENTIDADES PRINCIPALES DE EVALUACIÓN DOCENTE
@@ -118,18 +120,6 @@ erDiagram
         text comentario
     }
 
-    PLANES {
-        integer id_plan PK
-        boolean aprobacion_automatica
-        date fecha_creacion
-        varchar nombre
-        integer id_carrera FK
-        integer n_semestres
-        varchar version
-        boolean vigente
-        text descripcion
-    }
-
     CARRERAS {
         integer id_carrera PK
         varchar codigo
@@ -159,16 +149,6 @@ erDiagram
         varchar especialidad
     }
 
-    INTEGRANTE {
-        integer id_ramo FK
-        integer id_curso FK
-        varchar id_periodo FK
-        integer rut FK
-        integer id_cargo FK
-        integer id_estado FK
-        float porcentaje
-    }
-
     CARGOS {
         integer id_cargo PK
         varchar cargo
@@ -176,111 +156,7 @@ erDiagram
         boolean activo
     }
 
-    %% ASISTENCIA Y EVENTOS
-
-    EVENTO {
-        integer id_evento PK
-        integer id_curso FK
-        varchar periodo FK
-        date fecha
-        time hora_inicio
-        time hora_fin
-        varchar tipo_evento
-    }
-
-    ASISTENCIA_CURSOS {
-        integer id_curso FK
-        varchar periodo FK
-        date fecha
-        integer rut FK
-        integer id_asistencia FK
-        integer id_evento FK
-    }
-
-    TIPO_ASISTENCIA {
-        integer id_asistencia PK
-        varchar tipo "Presente|Ausente|Justificado"
-        varchar descripcion
-    }
-
-    %% HORARIOS Y SALAS
-
-    HORARIO {
-        integer id_horario PK
-        integer id_curso FK
-        integer id_ramo FK
-        integer semana
-        integer dia_semana
-        time hora_inicio
-        time hora_fin
-        varchar id_tipo_clase FK
-        jsonb salas
-    }
-
-    TIPOS_HORARIOS_CLASES {
-        varchar id PK
-        varchar tipo_clase
-        varchar descripcion
-    }
-
-    SALAS {
-        integer id_institucion FK
-        integer id_sala PK
-        varchar nombre
-        varchar edificio
-        varchar ubicacion
-        boolean hibrida
-        integer capacidad
-        integer capacidad_examen
-        integer aforo
-        boolean exclusiva
-    }
-
-    %% AVANCE CURRICULAR
-
-    AVANCE_CURRICULAR {
-        integer rut FK
-        integer id_plan FK
-        float avance "Porcentaje de avance"
-        integer total "Total asignaturas"
-        integer aprobadas
-        integer reprobadas
-        integer pendientes
-    }
-
-    AVANCE_CURRICULAR_POR_PERIODO {
-        integer rut PK,FK
-        integer id_plan PK,FK
-        varchar periodo PK,FK
-        float avance_periodo
-        integer asignaturas_inscritas
-        integer asignaturas_aprobadas
-    }
-
-    %% TIPOS DE ESTADO Y SITUACIÓN
-
-    TIPOS_ESTADO {
-        integer id PK
-        varchar nombre
-        varchar texto
-        varchar estado
-    }
-
-    ALUMNO_ESTADO {
-        integer rut FK
-        integer id_tipo_estado FK
-        varchar periodo FK
-        date fecha_cambio
-        text observaciones
-    }
-
-    SITUACION {
-        integer id_situacion PK
-        varchar descripcion
-        boolean activa
-    }
-
-    %% INSTITUCIONES Y DEPARTAMENTOS
+    %% INSTITUCIONES
 
     INSTITUCIONES {
         integer id_institucion PK
@@ -291,45 +167,141 @@ erDiagram
         varchar email
     }
 
-    DEPARTAMENTO {
-        integer id_departamento PK
-        varchar nombre
-        varchar codigo
+    %% ENTIDADES DE CURSOS INSCRITOS
+
+    CURSOS_INSCRITOS {
+        integer rut PK,FK
+        integer id_curso PK,FK
+        integer id_ramo PK,FK
+        varchar id_periodo PK,FK
+        integer id_tipo_escuela FK
+        integer id_estado_final FK
+        integer id_estado_curso FK
         integer id_institucion FK
-        varchar telefono
-        varchar email
-    }
-
-    %% CONJUNTOS Y MALLAS
-
-    CONJUNTOS {
-        integer id_conjunto PK
-        varchar nombre
-        varchar descripcion
-        varchar tipo
-    }
-
-    MALLAS {
-        integer id_malla PK
-        integer id_plan FK
-        integer id_ramo FK
-        integer semestre_sugerido
-        boolean obligatorio
-        text requisitos
-    }
-
-    CURSOS_HOMOLOGADOS {
-        integer rut FK
-        integer id_ramo FK
-        varchar id_periodo FK
-        float nota_final
-        text observaciones
+        varchar nota_final
         varchar tema
+        timestamp fecha_modificacion
+    }
+
+    %% ENTIDADES DE EVALUACIONES Y NOTAS
+
+    EVALUACIONES {
+        integer id_evaluacion PK
+        integer id_curso FK
+        integer id_ramo FK
+        varchar periodo FK
+        varchar t "Título/Nombre evaluación"
+        varchar categoria
+        varchar escala_texto
+        date fecha
+        varchar formula
+    }
+
+    NOTAS {
+        integer id_curso PK,FK
+        integer id_ramo PK,FK
+        integer id_evaluacion PK,FK
+        integer rut PK,FK
+        varchar periodo FK
+        varchar nota
+        text comentario
+        date fecha
+    }
+
+    NOTAS_BINARIO_RD {
+        integer id_curso PK,FK
+        integer id_ramo PK,FK
+        integer rut PK,FK
+        varchar periodo FK
+        varchar nota "Aprobado/Reprobado"
+        date fecha
+    }
+
+    NOTAS_CATEGORICAS_IMB {
+        integer id_curso PK,FK
+        integer id_ramo PK,FK
+        integer rut PK,FK
+        varchar periodo FK
+        varchar nota "Insuficiente/Suficiente/Bueno/MuyBueno"
+        date fecha
+    }
+
+    NOTAS_CATEGORICAS_RD {
+        integer id_curso PK,FK
+        integer id_ramo PK,FK
+        integer rut PK,FK
+        varchar periodo FK
+        varchar nota "Reprobado/Suficiente/A-/Aprobado/A+/Distinción"
+        date fecha
+    }
+
+    NOTAS_NUM_1_7 {
+        integer id_curso PK,FK
+        integer id_ramo PK,FK
+        integer rut PK,FK
+        varchar periodo FK
+        decimal nota "Nota numérica 1-7"
+        date fecha
+    }
+
+    NOTAS_NUM_1_10 {
+        integer id_curso PK,FK
+        integer id_ramo PK,FK
+        integer rut PK,FK
+        varchar periodo FK
+        decimal nota "Nota numérica 1-10"
+        date fecha
+    }
+
+    NOTAS_PERCENTIL {
+        integer id_curso PK,FK
+        integer id_ramo PK,FK
+        integer rut PK,FK
+        varchar periodo FK
+        decimal nota "Nota en percentil"
+        date fecha
+    }
+
+    %% TIPOS
+
+    TIPO_SITUACION {
+        integer id PK
+        varchar texto
+        integer estado
+    }
+
+    TIPO_ESTADO_SITUACION {
+        integer id_estado PK
+        varchar estado_texto
+    }
+
+    TIPO_DE_TITULO {
+        integer id PK
+        varchar texto
+        integer estado
+    }
+
+    PERSONAS_TIPO_INGRESO {
+        integer id PK
+        varchar texto
+        integer estado
+    }
+
+    INSCRITOS_ESTADO {
+        integer id PK
+        varchar texto
+        integer estado
+    }
+
+    INSCRITOS_ESTADO_FINAL {
+        integer id PK
+        varchar texto
+        integer estado
     }
 
     %% RELACIONES PRINCIPALES
 
-    %% Relaciones de Encuestas
+    %% Sistema de Encuestas
     EVALUACION_DOCENTE ||--o{ ENCUESTAS : "define"
     ENCUESTAS ||--o{ ENCUESTA_SECCION : "organiza"
     SECCIONES ||--o{ ENCUESTA_SECCION : "pertenece"
@@ -341,7 +313,7 @@ erDiagram
     EVALUACION_DOCENTE ||--o{ ENCUESTAS_CODIGOS : "aplica_a"
     RAMOS ||--o{ ENCUESTAS_CODIGOS : "evaluado_en"
 
-    %% Relaciones de Entregas y Respuestas
+    %% Entregas y Respuestas
     ENCUESTAS ||--o{ ENTREGAS : "genera"
     CURSOS ||--o{ ENTREGAS : "recibe"
     RAMOS ||--o{ ENTREGAS : "asociado"
@@ -350,55 +322,62 @@ erDiagram
     PREGUNTAS ||--o{ RESPUESTAS_OPCIONES : "responde"
     PREGUNTAS ||--o{ RESPUESTAS_PARRAFO : "responde"
     OPCIONES ||--o{ RESPUESTAS_OPCIONES : "selecciona"
-
     %% Relaciones Académicas
     PERIODOS ||--o{ ENCUESTAS : "ejecuta_en"
     PERIODOS ||--o{ CURSOS : "programa"
     RAMOS ||--o{ CURSOS : "dicta"
-    CARRERAS ||--o{ PLANES : "tiene"
-    PLANES ||--o{ MALLAS : "estructura"
-    RAMOS ||--o{ MALLAS : "incluye"
     INSTITUCIONES ||--o{ CARRERAS : "ofrece"
     INSTITUCIONES ||--o{ RAMOS : "administra"
-    INSTITUCIONES ||--o{ DEPARTAMENTO : "organiza"
-    INSTITUCIONES ||--o{ SALAS : "posee"
 
-    %% Relaciones de Personas
-    ALUMNOS ||--o{ INTEGRANTE : "participa"
-    PROFESORES ||--o{ INTEGRANTE : "enseña"
-    CURSOS ||--o{ INTEGRANTE : "incluye"
-    RAMOS ||--o{ INTEGRANTE : "inscribe"
-    CARGOS ||--o{ INTEGRANTE : "asigna"
-    TIPOS_ESTADO ||--o{ INTEGRANTE : "estado"
-    ALUMNOS ||--o{ AVANCE_CURRICULAR : "progresa"
-    PLANES ||--o{ AVANCE_CURRICULAR : "mide"
-    ALUMNOS ||--o{ AVANCE_CURRICULAR_POR_PERIODO : "avanza"
-    PLANES ||--o{ AVANCE_CURRICULAR_POR_PERIODO : "evalua"
-    PERIODOS ||--o{ AVANCE_CURRICULAR_POR_PERIODO : "registra"
+    %% Relaciones de Cursos Inscritos
+    ALUMNOS ||--o{ CURSOS_INSCRITOS : "inscribe"
+    CURSOS ||--o{ CURSOS_INSCRITOS : "es_inscrito_en"
+    RAMOS ||--o{ CURSOS_INSCRITOS : "corresponde_a"
+    PERIODOS ||--o{ CURSOS_INSCRITOS : "durante"
+    INSTITUCIONES ||--o{ CURSOS_INSCRITOS : "gestiona"
+    CURSOS_INSCRITOS ||--|| INSCRITOS_ESTADO : "tiene_estado_curso"
+    CURSOS_INSCRITOS ||--|| INSCRITOS_ESTADO_FINAL : "tiene_estado_final"
 
-    %% Relaciones de Asistencia
-    CURSOS ||--o{ EVENTO : "programa"
-    PERIODOS ||--o{ EVENTO : "calendario"
-    ALUMNOS ||--o{ ASISTENCIA_CURSOS : "asiste"
-    CURSOS ||--o{ ASISTENCIA_CURSOS : "registra"
-    PERIODOS ||--o{ ASISTENCIA_CURSOS : "controla"
-    TIPO_ASISTENCIA ||--o{ ASISTENCIA_CURSOS : "clasifica"
-    EVENTO ||--o{ ASISTENCIA_CURSOS : "documenta"
+    %% Relaciones de Evaluaciones y Notas
+    CURSOS ||--o{ EVALUACIONES : "tiene"
+    RAMOS ||--o{ EVALUACIONES : "asociada_a"
+    PERIODOS ||--o{ EVALUACIONES : "realizada_en"
+    EVALUACIONES ||--o{ NOTAS : "califica_con"
+    NOTAS ||--|| CURSOS : "registra_en"
+    NOTAS ||--|| RAMOS : "corresponde_a"
+    NOTAS ||--|| ALUMNOS : "obtiene"
+    NOTAS ||--|| PERIODOS : "emitida_en"
 
-    %% Relaciones de Horarios
-    CURSOS ||--o{ HORARIO : "programa"
-    RAMOS ||--o{ HORARIO : "asigna"
-    TIPOS_HORARIOS_CLASES ||--o{ HORARIO : "define"
+    %% Relaciones de Tipos de Notas
+    ALUMNOS ||--o{ NOTAS_BINARIO_RD : "obtiene"
+    ALUMNOS ||--o{ NOTAS_CATEGORICAS_IMB : "obtiene"
+    ALUMNOS ||--o{ NOTAS_CATEGORICAS_RD : "obtiene"
+    ALUMNOS ||--o{ NOTAS_NUM_1_7 : "obtiene"
+    ALUMNOS ||--o{ NOTAS_NUM_1_10 : "obtiene"
+    ALUMNOS ||--o{ NOTAS_PERCENTIL : "obtiene"
+    CURSOS ||--o{ NOTAS_BINARIO_RD : "evalua_en"
+    CURSOS ||--o{ NOTAS_CATEGORICAS_IMB : "evalua_en"
+    CURSOS ||--o{ NOTAS_CATEGORICAS_RD : "evalua_en"
+    CURSOS ||--o{ NOTAS_NUM_1_7 : "evalua_en"
+    CURSOS ||--o{ NOTAS_NUM_1_10 : "evalua_en"
+    CURSOS ||--o{ NOTAS_PERCENTIL : "evalua_en"
+    RAMOS ||--o{ NOTAS_BINARIO_RD : "asigna"
+    RAMOS ||--o{ NOTAS_CATEGORICAS_IMB : "asigna"
+    RAMOS ||--o{ NOTAS_CATEGORICAS_RD : "asigna"
+    RAMOS ||--o{ NOTAS_NUM_1_7 : "asigna"
+    RAMOS ||--o{ NOTAS_NUM_1_10 : "asigna"
+    RAMOS ||--o{ NOTAS_PERCENTIL : "asigna"
+    PERIODOS ||--o{ NOTAS_BINARIO_RD : "durante"
+    PERIODOS ||--o{ NOTAS_CATEGORICAS_IMB : "durante"
+    PERIODOS ||--o{ NOTAS_CATEGORICAS_RD : "durante"
+    PERIODOS ||--o{ NOTAS_NUM_1_7 : "durante"
+    PERIODOS ||--o{ NOTAS_NUM_1_10 : "durante"
+    PERIODOS ||--o{ NOTAS_PERCENTIL : "durante"
 
-    %% Relaciones de Estados
-    ALUMNOS ||--o{ ALUMNO_ESTADO : "mantiene"
-    TIPOS_ESTADO ||--o{ ALUMNO_ESTADO : "clasifica"
-    PERIODOS ||--o{ ALUMNO_ESTADO : "registra"
-
-    %% Relaciones de Homologación
-    ALUMNOS ||--o{ CURSOS_HOMOLOGADOS : "obtiene"
-    RAMOS ||--o{ CURSOS_HOMOLOGADOS : "reconoce"
-    PERIODOS ||--o{ CURSOS_HOMOLOGADOS : "registra"
+    %% Relaciones con Tipos
+    CARRERAS ||--|| TIPO_DE_TITULO : "otorga"
+    ALUMNOS ||--|| PERSONAS_TIPO_INGRESO : "ingresa_por"
+    PROFESORES ||--|| PERSONAS_TIPO_INGRESO : "ingresa_por"
 ```
 
 ## Relaciones y Uniones
@@ -532,3 +511,52 @@ A continuación se describen las uniones principales entre tablas, incluyendo ca
 
 - **profesores ↔ departamento**: INNER JOIN ON profesores.id_departamento = departamento.id_departamento (si existe este campo).
 - **alumnos ↔ situacion**: INNER JOIN ON alumnos.rut = situacion.rut.
+
+### Relaciones de Notas y Evaluaciones
+
+- **notas ↔ [`cursos`](dbt-etl/dbt_ury/models/ucampus/features/cursos/cursos.yml)**: INNER JOIN ON `notas.id_curso` = `cursos.id_curso`.
+- **notas ↔ [`ramos`](dbt-etl/dbt_ury/models/ucampus/features/ramos/ramos.yml)**: INNER JOIN ON `notas.id_ramo` = `ramos.id_ramo`.
+- **notas ↔ [`evaluaciones`](dbt-etl/dbt_ury/models/ucampus/features/notas/evaluaciones.yml)**: INNER JOIN ON `notas.id_evaluacion` = `evaluaciones.id_evaluacion`.
+- **notas ↔ [`alumnos`](dbt-etl/dbt_ury/models/ucampus/features/personas/alumnos.yml)**: INNER JOIN ON `notas.rut` = `alumnos.rut`.
+- **notas ↔ [`periodos`](dbt-etl/dbt_ury/models/ucampus/features/periodos/periodos.yml)**: INNER JOIN ON `notas.periodo` = `periodos.id_periodo`.
+- **[`evaluaciones`](dbt-etl/dbt_ury/models/ucampus/features/notas/evaluaciones.yml) ↔ [`cursos`](dbt-etl/dbt_ury/models/ucampus/features/cursos/cursos.yml)**: INNER JOIN ON `evaluaciones.id_curso` = `cursos.id_curso`.
+- **[`evaluaciones`](dbt-etl/dbt_ury/models/ucampus/features/notas/evaluaciones.yml) ↔ [`ramos`](dbt-etl/dbt_ury/models/ucampus/features/ramos/ramos.yml)**: INNER JOIN ON `evaluaciones.id_ramo` = `ramos.id_ramo`.
+- **[`evaluaciones`](dbt-etl/dbt_ury/models/ucampus/features/notas/evaluaciones.yml) ↔ [`periodos`](dbt-etl/dbt_ury/models/ucampus/features/periodos/periodos.yml)**: INNER JOIN ON `evaluaciones.periodo` = `periodos.id_periodo`.
+
+### Relaciones de Tipos de Notas Específicas
+
+- **notas_binario_rd ↔ [`alumnos`](dbt-etl/dbt_ury/models/ucampus/features/personas/alumnos.yml)**: INNER JOIN ON `notas_binario_rd.rut` = `alumnos.rut`.
+- **notas_binario_rd ↔ [`cursos`](dbt-etl/dbt_ury/models/ucampus/features/cursos/cursos.yml)**: INNER JOIN ON `notas_binario_rd.id_curso` = `cursos.id_curso`.
+- **notas_binario_rd ↔ [`ramos`](dbt-etl/dbt_ury/models/ucampus/features/ramos/ramos.yml)**: INNER JOIN ON `notas_binario_rd.id_ramo` = `ramos.id_ramo`.
+- **notas_binario_rd ↔ [`periodos`](dbt-etl/dbt_ury/models/ucampus/features/periodos/periodos.yml)**: INNER JOIN ON `notas_binario_rd.periodo` = `periodos.id_periodo`.
+
+- **notas_categoricas_imb ↔ [`alumnos`](dbt-etl/dbt_ury/models/ucampus/features/personas/alumnos.yml)**: INNER JOIN ON `notas_categoricas_imb.rut` = `alumnos.rut`.
+- **notas_categoricas_imb ↔ [`cursos`](dbt-etl/dbt_ury/models/ucampus/features/cursos/cursos.yml)**: INNER JOIN ON `notas_categoricas_imb.id_curso` = `cursos.id_curso`.
+- **notas_categoricas_imb ↔ [`ramos`](dbt-etl/dbt_ury/models/ucampus/features/ramos/ramos.yml)**: INNER JOIN ON `notas_categoricas_imb.id_ramo` = `ramos.id_ramo`.
+- **notas_categoricas_imb ↔ [`periodos`](dbt-etl/dbt_ury/models/ucampus/features/periodos/periodos.yml)**: INNER JOIN ON `notas_categoricas_imb.periodo` = `periodos.id_periodo`.
+
+- **notas_categoricas_rd ↔ [`alumnos`](dbt-etl/dbt_ury/models/ucampus/features/personas/alumnos.yml)**: INNER JOIN ON `notas_categoricas_rd.rut` = `alumnos.rut`.
+- **notas_categoricas_rd ↔ [`cursos`](dbt-etl/dbt_ury/models/ucampus/features/cursos/cursos.yml)**: INNER JOIN ON `notas_categoricas_rd.id_curso` = `cursos.id_curso`.
+- **notas_categoricas_rd ↔ [`ramos`](dbt-etl/dbt_ury/models/ucampus/features/ramos/ramos.yml)**: INNER JOIN ON `notas_categoricas_rd.id_ramo` = `ramos.id_ramo`.
+- **notas_categoricas_rd ↔ [`periodos`](dbt-etl/dbt_ury/models/ucampus/features/periodos/periodos.yml)**: INNER JOIN ON `notas_categoricas_rd.periodo` = `periodos.id_periodo`.
+
+- **notas_num_1_7 ↔ [`alumnos`](dbt-etl/dbt_ury/models/ucampus/features/personas/alumnos.yml)**: INNER JOIN ON `notas_num_1_7.rut` = `alumnos.rut`.
+- **notas_num_1_7 ↔ [`cursos`](dbt-etl/dbt_ury/models/ucampus/features/cursos/cursos.yml)**: INNER JOIN ON `notas_num_1_7.id_curso` = `cursos.id_curso`.
+- **notas_num_1_7 ↔ [`ramos`](dbt-etl/dbt_ury/models/ucampus/features/ramos/ramos.yml)**: INNER JOIN ON `notas_num_1_7.id_ramo` = `ramos.id_ramo`.
+- **notas_num_1_7 ↔ [`periodos`](dbt-etl/dbt_ury/models/ucampus/features/periodos/periodos.yml)**: INNER JOIN ON `notas_num_1_7.periodo` = `periodos.id_periodo`.
+
+- **notas_num_1_10 ↔ [`alumnos`](dbt-etl/dbt_ury/models/ucampus/features/personas/alumnos.yml)**: INNER JOIN ON `notas_num_1_10.rut` = `alumnos.rut`.
+- **notas_num_1_10 ↔ [`cursos`](dbt-etl/dbt_ury/models/ucampus/features/cursos/cursos.yml)**: INNER JOIN ON `notas_num_1_10.id_curso` = `cursos.id_curso`.
+- **notas_num_1_10 ↔ [`ramos`](dbt-etl/dbt_ury/models/ucampus/features/ramos/ramos.yml)**: INNER JOIN ON `notas_num_1_10.id_ramo` = `ramos.id_ramo`.
+- **notas_num_1_10 ↔ [`periodos`](dbt-etl/dbt_ury/models/ucampus/features/periodos/periodos.yml)**: INNER JOIN ON `notas_num_1_10.periodo` = `periodos.id_periodo`.
+
+- **notas_percentil ↔ [`alumnos`](dbt-etl/dbt_ury/models/ucampus/features/personas/alumnos.yml)**: INNER JOIN ON `notas_percentil.rut` = `alumnos.rut`.
+- **notas_percentil ↔ [`cursos`](dbt-etl/dbt_ury/models/ucampus/features/cursos/cursos.yml)**: INNER JOIN ON `notas_percentil.id_curso` = `cursos.id_curso`.
+- **notas_percentil ↔ [`ramos`](dbt-etl/dbt_ury/models/ucampus/features/ramos/ramos.yml)**: INNER JOIN ON `notas_percentil.id_ramo` = `ramos.id_ramo`.
+- **notas_percentil ↔ [`periodos`](dbt-etl/dbt_ury/models/ucampus/features/periodos/periodos.yml)**: INNER JOIN ON `notas_percentil.periodo` = `periodos.id_periodo`.
+
+### Relaciones con Tablas de Tipos Específicos
+
+- **[`carreras`](dbt-etl/dbt_ury/models/ucampus/features/carreras/carreras.yml) ↔ [`tipo_de_titulo`](dbt-etl/dbt_ury/models/ucampus/features/tipos_estado/tipo_de_titulo.yml)**: INNER JOIN ON `carreras.id_tipo_titulo` = `tipo_de_titulo.id`.
+- **[`alumnos`](dbt-etl/dbt_ury/models/ucampus/features/personas/alumnos.yml) ↔ [`personas_tipo_ingreso`](dbt-etl/dbt_ury/models/ucampus/features/tipos_estado/personas_tipo_ingreso.yml)**: INNER JOIN ON `alumnos.tipo_ingreso` = `personas_tipo_ingreso.id`.
+- **[`profesores`](dbt-etl/dbt_ury/models/ucampus/features/personas/profesores.yml) ↔ [`personas_tipo_ingreso`](dbt-etl/dbt_ury/models/ucampus/features/tipos_estado/personas_tipo_ingreso.yml)**: INNER JOIN ON `profesores.tipo_ingreso` = `personas_tipo_ingreso.id`.
